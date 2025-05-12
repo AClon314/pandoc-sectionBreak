@@ -77,7 +77,7 @@ def prepare(doc: pan.Doc):
         else:
             pan.debug(I18N['warn_no_template'][LANG].format(temp=template))
     elif doc.format == 'html' or 'markdown' in doc.format:
-        doc.content.insert(0, pan.RawInline(HTML_CSS, format='html'))
+        doc.content.insert(0, pan.RawBlock(HTML_CSS, format='html'))
     else:
         pan.debug(f'Skip un-implemented doc format: {getattr(doc, 'format', 'None')}')
 
