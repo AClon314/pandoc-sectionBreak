@@ -1,39 +1,55 @@
-# pandoc-docx-pagebreak
+# pandoc-sectionBreak
 
-A Pandoc filter that replaces `PAGEBREAK` and `PAGEBREAKLANDSCAPE` with their
-right Word section breaks. This enables documents to have a mixed layout
-including portait and landscape sections. The filter can also be used just
-for the page-break functionality provided.
+Rewrite [alexstoick/pandoc-docx-pagebreak](https://github.com/alexstoick/pandoc-docx-pagebreak/blob/master/pandoc-docx-pagebreak.hs) into python.
 
-## Usage
+See [Differences between "???breaks"](https://support.microsoft.com/en-us/office/insert-a-section-break-eef20fd8-e38c-4ba6-a027-e503bdf8375c)
 
-Example `markdown`:
+## Install 安装
+```sh
+pip install git+https://github.com/AClon314/pandoc-sectionBreak.git
+```
+
+## Usage 用法
+If you want new page have **different** page-number like:
+
+`Ⅰ,Ⅱ,Ⅲ` for Abstract, `1,2,3` for Body, then:
 
 ```markdown
+---
+template: reference-doc.docx
+---
+摘要
 
-Portrait content ...
+<!-- 分页符: https://github.com/pandoc-ext/pagebreak
+会跟随同一节的页边距、页码等格式 -->
+\newpage
 
-PAGEBREAK
+Abstract end
 
-+--------+------+-------+------+------+-----+-----+----+----------+
-| Really | Long | Table | That | Does | Not | Fit | On | Portrait |
-+========+======+=======+======+======+=====+=====+====+==========+
-| 1      | 2    | 3     | 4    | 5    | 6   | 7   | 8  | 9        |
-+--------+------+-------+------+------+-----+-----+----+----------+
+<!-- 分节符: 独立的页边距、页码等格式 -->
+<br section> 
 
-PAGEBREAKLANDSCAPE
-
-Just text ... (portrait again)
-
+Body start
+<br continue> <!-- 连续分节符 -->
+<br odd> <!-- 奇数页 -->
+<br even> <!-- 偶数页 -->
+<br col> <!-- 分列符 -->
 ```
 
+Assign `template` for using the section format in `<w:sectPr>...<w:sectPr />` block
 
-## Installation
+If you have multiple `<w:sectPr>` in `reference.docx`, you can assign `section: 5` to use the 5th `<w:sectPr>` format. See [test.md](./tests/test.md) for more.
 
-### Using cabal and Hackage
+## Dev 调试
 
+If you encounter error, assign environment `DEBUG=1` variable to show debug message:
+```sh
+DEBUG=1 pandoc --filter pandoc-sectionBreak ...
 ```
-git clone git@github.com:alexstoick/pandoc-docx-pagebreak.git
-cd pandoc-docx-pagebreak
-stack install pandoc-docx-pagebreak
-```
+
+Apply:
+
+- `.html`: css `@media print`
+- `.docx`: tag `<w:sectPr>`
+
+See [raw openxml implementation](https://github.com/jgm/pandoc/discussions/10765)
